@@ -2,6 +2,8 @@
 
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import TaskItem from '@tiptap/extension-task-item'
+import TaskList from '@tiptap/extension-task-list'
 
 export const Editor = () => {
   const editor = useEditor({
@@ -12,7 +14,13 @@ export const Editor = () => {
 
       }
     },
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      TaskList,
+      TaskItem.configure({
+        nested: true
+      }),
+    ],
     content: '<p>Hello World! 🌎️</p>',
   })
 
