@@ -47,6 +47,13 @@ const Toolbar = () => {
 
   const [_, setTrigger] = useState(0) // trigger is not used, just forces rerender
 
+  /*
+    Add state to trigger re-renders on editor updates:
+    This ensures that every time the content or selection updates, 
+    the component re-renders, and things like editor.isActive('bold') are freshly evaluated.
+    So that we can see the isActive and not active UI display
+  */
+
   useEffect(() => {
     if (!editor) return
 
