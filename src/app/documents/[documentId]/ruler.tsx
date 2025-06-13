@@ -57,29 +57,36 @@ const Ruler = () => {
     setIsDraggingRight(true)
   }
 
+  /**
+  * Handles mouse move events when dragging the ruler margins.
+  * Updates left or right margin based on mouse position, while maintaining constraints.
+  */
   const handleMouseMove = (e: React.MouseEvent) => {
     const pageWidth = 816;
     const miniumSpace = 100;
+
     if ((isDraggingLeft || isDraggingRight) && rulerRef.current) {
       const container = rulerRef.current.querySelector('#ruler-container');
+
       if (container) {
-        const containerRect = container.getBoundingClientRect();
-        const relativeX = e.clientX - containerRect.left;
-        const rawPosition = Math.max(0, Math.min(pageWidth, relativeX));
+        const containerRect = container.getBoundingClientRect(); // Get the position of the container on the screen
+        const relativeX = e.clientX - containerRect.left; // Calculate mouse X position relative to the container
+        const rawPosition = Math.max(0, Math.min(pageWidth, relativeX)); // Clamp position within 0 and pageWidth
 
         if (isDraggingLeft) {
-          const maxLeftPosition = pageWidth - rightMargin - miniumSpace;
-          const newLeftPosition = Math.min(rawPosition, maxLeftPosition);
-          setLeftMargin(newLeftPosition) // TODO: Make collaborative
-        } else if (isDraggingRight) {
-          const maxRightPosition = pageWidth - (leftMargin + miniumSpace);
-          const newRightPosition = Math.max(pageWidth - rawPosition, 0);
+          const maxLeftPosition = pageWidth - rightMargin - miniumSpace; // Ensure minimum space is maintained
+          const newLeftPosition = Math.min(rawPosition, maxLeftPosition); // Clamp left margin to valid range
+          setLeftMargin(newLeftPosition); // (TODO: make collaborative for real-time sync)
+        }
+        else if (isDraggingRight) {
+          const maxRightPosition = pageWidth - (leftMargin + miniumSpace); // Ensure minimum space is maintained
+          const newRightPosition = Math.max(pageWidth - rawPosition, 0); // Calculate and clamp new right margin
           const constrainedRightPosition = Math.min(newRightPosition, maxRightPosition);
           setRightMargin(constrainedRightPosition);
         }
       }
     }
-  }
+  };
 
   const handleMouseUp = () => {
     setIsDraggingLeft(false);
