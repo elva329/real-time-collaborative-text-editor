@@ -18,8 +18,57 @@ import {
 } from "@/components/ui/menubar"
 import { BoldIcon, FileIcon, FileJsonIcon, FilePenIcon, FilePlusIcon, FileTextIcon, GlobeIcon, Italic, PrinterIcon, RemoveFormattingIcon, StrikethroughIcon, TextIcon, TrashIcon, UnderlineIcon, Undo2Icon } from 'lucide-react';
 import { BsFilePdf } from 'react-icons/bs';
+import { useEditorStore } from '../../store/use-editor-store';
 
 const NavBar = () => {
+  const { editor } = useEditorStore();
+
+  const insertTable = ({ rows, cols }: { rows: number, cols: number }) => {
+    editor
+      ?.chain()
+      .focus()
+      .insertTable({ rows, cols, withHeaderRow: false })
+      .run()
+  }
+
+  const onDownload = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click()
+  }
+
+  const onSaveJSON = () => {
+    if (!editor) return;
+
+    const content = editor.getJSON();
+    const blob = new Blob([JSON.stringify(content)], {
+      type: 'application/json'
+    });
+    onDownload(blob, `document.json`) // TODO: Use document name
+  }
+
+  const onSaveHTML = () => {
+    if (!editor) return;
+
+    const content = editor.getHTML();
+    const blob = new Blob([content], {
+      type: 'text/html'
+    });
+    onDownload(blob, `document.html`) // TODO: Use document name
+  }
+
+  const onSaveText = () => {
+    if (!editor) return;
+
+    const content = editor.getText();
+    const blob = new Blob([content], {
+      type: 'text/plain'
+    });
+    onDownload(blob, `document.text`) // TODO: Use document name
+  }
+
   return (
     <nav className='flex items-center justify-between'>
       <div className='flex gap-2 items-center'>
@@ -41,19 +90,19 @@ const NavBar = () => {
                       Save
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem>
+                      <MenubarItem onClick={onSaveJSON}>
                         <FileJsonIcon className="size-4 mr-2" />
                         JSON
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={onSaveHTML}>
                         <GlobeIcon className="size-4 mr-2" />
                         HTML
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => window.print()}>
                         <BsFilePdf className="size-4 mr-2" />
                         PDF
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={onSaveText}>
                         <FileTextIcon className="size-4 mr-2" />
                         Text
                       </MenubarItem>
@@ -88,12 +137,12 @@ const NavBar = () => {
                   Edit
                 </MenubarTrigger>
                 <MenubarContent>
-                  <MenubarItem>
+                  <MenubarItem onClick={() => editor?.chain().focus().undo().run()}>
                     <Undo2Icon className='size-4' />
                     Undo <MenubarShortcut>&#8984;Z</MenubarShortcut>
                   </MenubarItem>
 
-                  <MenubarItem>
+                  <MenubarItem onClick={() => editor?.chain().focus().redo().run()}>
                     <Undo2Icon className='size-4' />
                     Redo <MenubarShortcut>&#8984;Y</MenubarShortcut>
                   </MenubarItem>
@@ -109,10 +158,10 @@ const NavBar = () => {
                   <MenubarSub>
                     <MenubarSubTrigger>Table</MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem>1 × 1</MenubarItem>
-                      <MenubarItem>2 × 2</MenubarItem>
-                      <MenubarItem>3 × 3</MenubarItem>
-                      <MenubarItem>4 × 4</MenubarItem>
+                      <MenubarItem onClick={() => insertTable({ rows: 1, cols: 1 })}>1 × 1</MenubarItem>
+                      <MenubarItem onClick={() => insertTable({ rows: 2, cols: 2 })}>2 × 2</MenubarItem>
+                      <MenubarItem onClick={() => insertTable({ rows: 3, cols: 3 })}>3 × 3</MenubarItem>
+                      <MenubarItem onClick={() => insertTable({ rows: 4, cols: 4 })}>4 × 4</MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
                 </MenubarContent>
@@ -130,26 +179,26 @@ const NavBar = () => {
                     </MenubarSubTrigger>
 
                     <MenubarSubContent>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => editor?.chain().focus().toggleBold().run()}>
                         <BoldIcon className='size-4' />
                         Bold<MenubarShortcut>&#8984;B</MenubarShortcut>
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => editor?.chain().focus().toggleItalic().run()}>
                         <Italic className='size-4' />
                         Italic<MenubarShortcut>&#8984;I</MenubarShortcut>
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => editor?.chain().focus().toggleUnderline().run()}>
                         <UnderlineIcon className='size-4' />
                         Underline<MenubarShortcut>&#8984;U</MenubarShortcut>
                       </MenubarItem>
-                      <MenubarItem>
+                      <MenubarItem onClick={() => editor?.chain().focus().toggleStrike().run()}>
                         <StrikethroughIcon className='size-4' />
                         Strikethrough<MenubarShortcut>&#8984;S</MenubarShortcut>
                       </MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
 
-                  <MenubarItem>
+                  <MenubarItem onClick={() => editor?.chain().focus().unsetAllMarks().run()}>
                     <RemoveFormattingIcon className='size-4' />
                     Clear formatting
                   </MenubarItem>
