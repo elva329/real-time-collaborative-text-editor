@@ -7,7 +7,7 @@ import { SearchIcon, XIcon } from 'lucide-react'
 import useSearchParams from '../../hooks/use-search-params'
 
 const SearchInput = () => {
-  const [search, setSearch] = useSearchParams('search')
+  const [search, setSearch] = useSearchParams()
   const [value, setValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -18,6 +18,7 @@ const SearchInput = () => {
 
   const handleClear = () => {
     setValue('');
+    setSearch('');
     inputRef.current?.blur();
   }
 
